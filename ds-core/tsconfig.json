@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "paths": {
+      "@aurea/ds-core/shared": ["./shared/index.ts"],
+      "@aurea/ds-core/mobile": ["./mobile/index.ts"],
+      "@aurea/ds-core/web": ["./web/index.ts"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}

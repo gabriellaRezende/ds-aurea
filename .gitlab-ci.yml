@@ -1,0 +1,23 @@
+image: node:22-alpine
+
+stages:
+  - validate
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+    - ds-core/node_modules/
+
+before_script:
+  - npm ci --prefer-offline
+
+typecheck:
+  stage: validate
+  script:
+    - npm run typecheck
+
+lint:
+  stage: validate
+  script:
+    - npm run lint

@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.base.json",
+  "include": [
+    "ds-core/**/*.ts",
+    "ds-core/**/*.tsx"
+  ],
+  "exclude": [
+    "**/node_modules"
+  ]
+}

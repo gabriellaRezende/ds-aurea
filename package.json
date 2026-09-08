@@ -1,0 +1,27 @@
+{
+  "name": "ds-aurea",
+  "private": true,
+  "version": "0.0.0",
+  "workspaces": [
+    "ds-core",
+    "playground/*"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ds-core",
+    "lint:fix": "eslint ds-core --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\""
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-react": "^7.37.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "prettier": "^3.3.0",
+    "typescript": "~5.9.0",
+    "typescript-eslint": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "@aurea/ds-core",
+  "version": "0.1.0",
+  "description": "Design System da Aurea — componentes, tokens e providers para web e mobile",
+  "private": false,
+  "exports": {
+    "./shared": {
+      "types": "./shared/index.ts",
+      "default": "./shared/index.ts"
+    },
+    "./mobile": {
+      "types": "./mobile/index.ts",
+      "default": "./mobile/index.ts"
+    },
+    "./web": {
+      "types": "./web/index.ts",
+      "default": "./web/index.ts"
+    }
+  },
+  "peerDependencies": {
+    "expo": "~55.0.0",
+    "react": "^19.2.0",
+    "react-native": "^0.83.0",
+    "react-native-paper": "^5.15.0",
+    "react-native-unistyles": "^3.1.0"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.0"
+  }
+}
