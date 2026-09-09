@@ -1,0 +1,10 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@aurea/ds-core/shared": ["../../ds-core/shared/index.ts"],
+      "@aurea/ds-core/mobile": ["../../ds-core/mobile/index.ts"]
+    }
+  }
+}
