@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useStyles } from 'react-native-unistyles';
+import { usePlayground } from '../../context/PlaygroundContext';
 
 export function MotionSection() {
-  const { theme } = useStyles();
+  const { theme } = usePlayground();
   const { duration, easing } = theme.motion;
 
   return (

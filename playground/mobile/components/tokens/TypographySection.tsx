@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useStyles } from 'react-native-unistyles';
+import { usePlayground } from '../../context/PlaygroundContext';
 
 export function TypographySection() {
-  const { theme } = useStyles();
+  const { theme } = usePlayground();
   const { roles } = theme.typography;
 
   return (

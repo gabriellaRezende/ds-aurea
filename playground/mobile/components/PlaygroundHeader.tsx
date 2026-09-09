@@ -1,11 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { usePlayground } from '../context/PlaygroundContext';
-import { useStyles } from 'react-native-unistyles';
 
 export function PlaygroundHeader() {
-  const { product, mode, setProduct, setMode } = usePlayground();
-  const { theme } = useStyles();
+  const { product, mode, theme, setProduct, setMode } = usePlayground();
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.borderSubtle }]}>

@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useStyles } from 'react-native-unistyles';
+import { usePlayground } from '../../context/PlaygroundContext';
 
 export function SpacingSection() {
-  const { theme } = useStyles();
+  const { theme } = usePlayground();
   const { spacing } = theme;
 
   const scales = Object.entries(spacing).filter(([, v]) => typeof v === 'number') as [string, number][];

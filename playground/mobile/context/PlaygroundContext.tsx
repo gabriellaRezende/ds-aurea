@@ -1,17 +1,24 @@
 import React, { createContext, useContext, useState } from 'react';
-import { UnistylesRuntime } from 'react-native-unistyles';
+import {
+  heliosLightTheme,
+  heliosDarkTheme,
+  uranusLightTheme,
+  uranusDarkTheme,
+} from '../theme';
+import type { AureaTheme } from '../theme';
 
 type Product = 'helios' | 'uranus';
 type Mode = 'light' | 'dark';
-type ThemeName = 'heliosLight' | 'heliosDark' | 'uranusLight' | 'uranusDark';
 
-function buildThemeName(product: Product, mode: Mode): ThemeName {
-  return `${product}${mode === 'light' ? 'Light' : 'Dark'}` as ThemeName;
-}
+const THEMES: Record<Product, Record<Mode, AureaTheme>> = {
+  helios: { light: heliosLightTheme, dark: heliosDarkTheme },
+  uranus: { light: uranusLightTheme, dark: uranusDarkTheme },
+};
 
 type PlaygroundContextType = {
   product: Product;
   mode: Mode;
+  theme: AureaTheme;
   setProduct: (product: Product) => void;
   setMode: (mode: Mode) => void;
 };
@@ -22,18 +29,13 @@ export function PlaygroundProvider({ children }: { children: React.ReactNode }) 
   const [product, setProductState] = useState<Product>('helios');
   const [mode, setModeState] = useState<Mode>('light');
 
-  const setProduct = (newProduct: Product) => {
-    setProductState(newProduct);
-    UnistylesRuntime.setTheme(buildThemeName(newProduct, mode));
-  };
+  const theme = THEMES[product][mode];
 
-  const setMode = (newMode: Mode) => {
-    setModeState(newMode);
-    UnistylesRuntime.setTheme(buildThemeName(product, newMode));
-  };
+  const setProduct = (newProduct: Product) => setProductState(newProduct);
+  const setMode = (newMode: Mode) => setModeState(newMode);
 
   return (
-    <PlaygroundContext.Provider value={{ product, mode, setProduct, setMode }}>
+    <PlaygroundContext.Provider value={{ product, mode, theme, setProduct, setMode }}>
       {children}
     </PlaygroundContext.Provider>
   );

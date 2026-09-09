@@ -12,6 +12,10 @@
       "types": "./mobile/index.ts",
       "default": "./mobile/index.ts"
     },
+    "./mobile/tokens": {
+      "types": "./mobile/tokens/index.ts",
+      "default": "./mobile/tokens/index.ts"
+    },
     "./web": {
       "types": "./web/index.ts",
       "default": "./web/index.ts"

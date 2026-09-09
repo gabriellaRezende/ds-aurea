@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useStyles } from 'react-native-unistyles';
+import { usePlayground } from '../../context/PlaygroundContext';
 import type { ThemeColors } from '@aurea/ds-core/shared';
 
 const STRING_SLOTS: (keyof ThemeColors)[] = [
@@ -13,7 +13,7 @@ const STRING_SLOTS: (keyof ThemeColors)[] = [
 ];
 
 export function ColorSection() {
-  const { theme } = useStyles();
+  const { theme } = usePlayground();
 
   return (
     <View style={styles.section}>

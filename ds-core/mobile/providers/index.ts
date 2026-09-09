@@ -39,6 +39,8 @@ export function configureHeliosTheme(config?: { adaptiveThemes?: boolean }) {
 
 // Registro completo com todos os produtos — usado pelo Playground.
 // Temas nomeados explicitamente para permitir alternância manual de produto.
+// initialThemeName é obrigatório quando não se usa adaptiveThemes, pois o
+// Unistyles precisa saber qual tema ativar antes do primeiro render.
 export function configureAllThemes() {
   StyleSheet.configure({
     themes: {
@@ -47,6 +49,8 @@ export function configureAllThemes() {
       uranusLight: uranusLightTheme,
       uranusDark: uranusDarkTheme,
     },
-    settings: {},
+    settings: {
+      initialThemeName: 'heliosLight' as never,
+    },
   });
 }

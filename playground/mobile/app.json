@@ -4,16 +4,26 @@
     "slug": "ds-playground-mobile",
     "version": "0.0.1",
     "scheme": "ds-playground",
-    "platforms": ["ios", "android"],
-    "assetBundlePatterns": ["**/*"],
-    "plugins": ["expo-router"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "newArchEnabled": false,
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "plugins": [
+      "expo-router"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.gabrella.r.dsplaygroundmobile"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E53935"
-      }
+      },
+      "package": "com.gabrella.r.dsplaygroundmobile"
     }
   }
 }

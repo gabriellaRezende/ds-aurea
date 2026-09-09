@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useStyles } from 'react-native-unistyles';
+import { usePlayground } from '../../context/PlaygroundContext';
 import { PlaygroundHeader } from '../../components/PlaygroundHeader';
 
 export default function ComponentsScreen() {
-  const { theme } = useStyles();
+  const { theme } = usePlayground();
 
   return (
     <SafeAreaView style={[styles.root, { backgroundColor: theme.colors.background }]} edges={['top']}>

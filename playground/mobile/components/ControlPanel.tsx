@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { useStyles } from 'react-native-unistyles';
+import { usePlayground } from '../context/PlaygroundContext';
 
 type Control = {
   key: string;
@@ -33,7 +33,7 @@ type ControlPanelProps = {
 //   />
 
 export function ControlPanel({ controls, values, onChange }: ControlPanelProps) {
-  const { theme } = useStyles();
+  const { theme } = usePlayground();
 
   return (
     <View style={[styles.panel, { backgroundColor: theme.colors.surface, borderTopColor: theme.colors.borderSubtle }]}>

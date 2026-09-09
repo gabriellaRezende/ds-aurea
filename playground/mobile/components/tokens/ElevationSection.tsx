@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useStyles } from 'react-native-unistyles';
+import { usePlayground } from '../../context/PlaygroundContext';
 
 export function ElevationSection() {
-  const { theme } = useStyles();
+  const { theme } = usePlayground();
   const entries = Object.entries(theme.elevation) as [string, typeof theme.elevation.xs][];
 
   return (

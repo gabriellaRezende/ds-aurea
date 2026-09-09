@@ -182,9 +182,29 @@ O alternador de produto é o item mais valioso: é ele que prova na tela que **c
 
 ---
 
+## Pré-Fase 3 — EAS Build + expo-dev-client
+
+**Fazer antes de qualquer código da Fase 3.** A Fase 3 reativa o Unistyles v3 (NitroModules), que não roda no Expo Go. Sem isso, o playground quebra no primeiro componente.
+
+- [ ] Instalar `expo-dev-client` no playground/mobile
+- [ ] Instalar e configurar a CLI do EAS (`npm install -g eas-cli`)
+- [ ] `eas login` + `eas build:configure` (gera `eas.json`)
+- [ ] Reativar `react-native-unistyles` no `package.json` do playground
+- [ ] Reativar o plugin `react-native-unistyles/plugin` no `babel.config.js`
+- [ ] Voltar `"newArchEnabled": true` no `app.json`
+- [ ] Rodar `eas build --profile development --platform android` (build na nuvem, ~10 min)
+- [ ] Instalar o `.apk` gerado no celular — substitui o Expo Go
+- [ ] Validar: playground abre, tema troca, tokens aparecem
+
+A partir daí o ciclo diário volta a ser `npx expo start` + QR, igual ao Expo Go, mas com suporte a NitroModules.
+
+> **Por que agora?** O playground está rodando no Expo Go com uma config simplificada (sem Unistyles, reanimated v3, newArch off). Essa config foi intencional para a Fase 2. A Pré-Fase 3 desfaz essas concessões antes de o primeiro componente com Unistyles existir.
+
+---
+
 ## Fase 3 — Atoms
 
-**Depende de:** Fases 1 e 2. Onda 2 do inventário.
+**Depende de:** Fases 1, 2 e Pré-Fase 3. Onda 2 do inventário.
 
 Ordem sugerida, do mais simples ao mais acoplado:
 
