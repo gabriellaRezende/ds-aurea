@@ -1,34 +1,34 @@
 # Plano de Distribuição — DS-Aurea
 
-> Como o DS-Aurea chega até os projetos consumidores e como ele é construído internamente.
+> O que fica dentro do ds-aurea, o que sai para os projetos consumidores e por qual caminho cada parte chega lá.
 
 ---
 
-## Problema
+## O ciclo completo
 
-O DS-Aurea tem **duas audiências opostas** que usam o mesmo formato de arquivo (`.md` com instruções para IA), mas com escopos incompatíveis:
-
-1. **Quem consome o DS** — helios-app, helios-portal, uranus-portal. Precisa da skill instalada no projeto deles.
-2. **Quem constrói o DS** — este repositório. Precisa de agentes e skills que ajudem a portar componentes e validar invariantes.
-
-Se os dois forem misturados na mesma pasta, acontece o pior cenário: a skill que deveria ser o cérebro de design dos produtos fica presa dentro do `ds-aurea` e nunca chega em quem precisa dela.
-
----
-
-## Princípio
+O ds-aurea tem duas audiências, e cada pasta serve a uma delas:
 
 ```txt
-      ┌─────────────────── ds-aurea ───────────────────┐
-      │                                                │
-  🔧 PRA DENTRO                                📦 PRA FORA
-  agentes/skills que ajudam                    skill instalada nos produtos
-  a CONSTRUIR o DS                             = cérebro de design
-      │                                                │
-  .claude/                                     skills/ + .claude-plugin/
-  local, não distribuído                       distribuído via /plugin install
+┌──────────────────────────────── ds-aurea/ ────────────────────────────────┐
+│                                                                           │
+│  🔧 CONSUMO INTERNO                    📦 CONSUMO PELOS OUTROS PROJETOS    │
+│  só o ds-aurea usa                     helios-app, helios-portal, uranus  │
+│                                                                           │
+│  .claude/                              ds-core/      componentes + spec   │
+│    skills e agentes que ajudam         ds-learning/  conhecimento de uso  │
+│    a estruturar o próprio DS           ds-skill/     skill que cria telas │
+│                                                      nos outros projetos  │
+└───────────────────────────────────────────────────────────────────────────┘
 ```
 
-Regra: **`.claude/` nunca sai do repositório. `skills/` na raiz sempre sai.**
+| Pasta | O que é | Quem usa | Como chega no consumidor |
+|---|---|---|---|
+| `.claude/` | skills e agentes de construção (`/ds-designer`, `port-component`, `ds-curator`) | só o ds-aurea | **não chega** — nunca sai do repositório |
+| `ds-core/` | componentes, tokens, temas e a `spec.md` técnica de cada componente | outros projetos | pacote npm `@aurea/ds-core` (ver `docs/INSTALLATION.md`) |
+| `ds-learning/` | conhecimento de uso: quando usar, quando não, tokens, princípios | outros projetos | **dentro do `ds-skill`** — o consumidor não instala o `ds-learning` direto, quem lê é a IA do projeto |
+| `ds-skill/` | a skill que orienta a IA a criar telas nos outros projetos usando o DS | outros projetos | plugin do Claude Code (`/plugin install`) |
+
+Regra: **`.claude/` nunca sai do repositório. `ds-skill/` sempre sai.** Uma skill de construção nunca vai para o `ds-skill`, e a skill de consumo nunca fica presa em `.claude/` — se ficasse, só funcionaria aqui dentro e nunca chegaria em quem precisa dela.
 
 ---
 
@@ -36,44 +36,105 @@ Regra: **`.claude/` nunca sai do repositório. `skills/` na raiz sempre sai.**
 
 ```txt
 ds-aurea/
-  .claude-plugin/
-    plugin.json              📦 manifesto do plugin
-    marketplace.json         📦 catálogo (permite /plugin marketplace add)
-
-  skills/                    📦 DISTRIBUÍDO
-    aurea-ds/
-      SKILL.md               roteador fino
-      rules/
-        use-ds-core.md
-        use-tokens.md
-        testid-contract.md
-        when-ds-lacks.md
-      knowledge/             cópia do ds-learning (viaja junto)
-      examples/
-
-  commands/                  📦 DISTRIBUÍDO
-    ds-check.md              /ds-check — audita a tela contra o DS
-
-  agents/                    📦 DISTRIBUÍDO (opcional)
-    ds-reviewer.md           subagente de revisão no projeto consumidor
-
-  .claude/                   🔧 LOCAL — some no consumidor
-    agents/
-      ds-curator.md          audita componente vs invariantes
+  .claude/                     🔧 INTERNO — nunca distribuído
+    commands/
+      ds-designer.md           /ds-designer — orquestra a esteira designer → dev → curador
     skills/
-      port-component/
-        SKILL.md             checklist: @lib/atoms/X → ds-core
-    settings.json
+      designer/                documental.md, visual.md
+      dev/                     desenvolvedor.md, curador.md
+      port-component/          checklist helios-app → ds-core/mobile
+    agents/
+      ds-curator.md            audita componente vs invariantes
+    README.md                  como a esteira funciona
 
-  ds-core/                   código do Design System
-  ds-learning/               fonte única de verdade das regras
-  playground/
+  .claude-plugin/
+    marketplace.json           📦 catálogo do marketplace — aponta para ./ds-skill
 
-  CLAUDE.md                  ponteiro
-  AGENTS.md                  invariantes sempre carregados
+  ds-core/                     📦 npm @aurea/ds-core
+    shared/                    tokens, temas, types, utils
+    mobile/components/<Nome>/  código + spec.md
+    web/components/<Nome>/     código + spec.md
+
+  ds-learning/                 📦 fonte do conhecimento (viaja dentro do ds-skill)
+    component-mobile/<Nome>.md
+    component-web/<Nome>.md
+    global/
+
+  ds-skill/                    📦 o plugin em si — raiz do plugin
+    .claude-plugin/
+      plugin.json              manifesto do plugin
+    skills/
+      aurea-ds/
+        SKILL.md               roteador fino
+        rules/                 como a IA trabalha no projeto consumidor
+          use-ds-core.md
+          use-tokens.md
+          testid-contract.md
+          when-ds-lacks.md
+        knowledge/             ⚙️ GERADO — nunca editar à mão
+    commands/
+      ds-check.md              /ds-check — audita a tela contra o DS
+
+  docs/                        processo e decisões do projeto (não distribuído)
+  playground/                  visualização dos componentes (não distribuído)
+  CLAUDE.md                    ponteiro
+  AGENTS.md                    invariantes de construção
 ```
 
-> ⚠️ **Regra de caminho crítica:** `skills/`, `commands/` e `agents/` ficam na **raiz do plugin**, nunca dentro de `.claude-plugin/`. O `.claude-plugin/` guarda só os manifestos JSON.
+> ⚠️ **Regra de caminho:** dentro do `ds-skill/`, as pastas `skills/` e `commands/` ficam na raiz do plugin, nunca dentro de `ds-skill/.claude-plugin/`. O `.claude-plugin/` guarda só o manifesto JSON.
+
+Há dois `.claude-plugin/`, cada um com um papel:
+
+- `ds-aurea/.claude-plugin/marketplace.json` — o **marketplace**. Diz "este repositório publica um plugin, e ele está em `./ds-skill`".
+- `ds-aurea/ds-skill/.claude-plugin/plugin.json` — o **plugin**. Diz o nome, a versão e a descrição.
+
+Assim, só o conteúdo de `ds-skill/` é instalado no consumidor. `.claude/`, `ds-core/`, `docs/` e `playground/` não vão junto.
+
+---
+
+## `rules/` e `knowledge/` — por que são separados
+
+Dentro da skill há duas coisas diferentes:
+
+| Pasta | Responde | Escrita onde |
+|---|---|---|
+| `rules/` | *como* a IA trabalha — quando consultar o DS, o que fazer quando falta componente, como checar uma tela | à mão, dentro do `ds-skill/` |
+| `knowledge/` | *o que* o DS é — componentes, props, tokens, regras de uso | **gerada** a partir do `ds-learning/` e das `spec.md` do `ds-core/` |
+
+`rules/` não repete conteúdo do DS. Ela diz "antes de montar uma tela, leia `knowledge/component-mobile/`" — nunca "o Button tem as variantes X e Y". O conteúdo fica só no `knowledge/`.
+
+---
+
+## Fonte única de verdade
+
+Cada informação é escrita **uma vez**, no lugar dela, e o `knowledge/` só recebe cópias:
+
+```txt
+ds-learning/component-mobile/*.md   ──┐
+ds-learning/component-web/*.md      ──┤
+ds-learning/global/**               ──┼──→  script de build  ──→  ds-skill/skills/aurea-ds/knowledge/
+ds-core/mobile/components/*/spec.md ──┤
+ds-core/web/components/*/spec.md    ──┘
+```
+
+Forma esperada do `knowledge/` gerado:
+
+```txt
+knowledge/
+  global/                      ← ds-learning/global/
+  component-mobile/<Nome>.md   ← ds-learning/component-mobile/<Nome>.md
+  component-web/<Nome>.md      ← ds-learning/component-web/<Nome>.md
+  spec-mobile/<Nome>.md        ← ds-core/mobile/components/<Nome>/spec.md
+  spec-web/<Nome>.md           ← ds-core/web/components/<Nome>/spec.md
+```
+
+**Por que copiar e não apontar para `../ds-learning`:** quando o plugin é instalado, o Claude Code copia só a pasta do plugin (`ds-skill/`). Caminhos que saem dela, como `../ds-learning`, não existem no consumidor.
+
+**Por que gerar por script e não copiar à mão:** cópia manual é drift garantido. A mesma regra escrita em dois lugares fica desatualizada em um deles em poucos meses.
+
+**O `knowledge/` gerado é commitado.** O plugin é instalado direto do git, sem passo de build no consumidor. Então o script roda antes de cada release, o resultado entra no commit, e a CI falha se o `knowledge/` estiver diferente do que o script geraria.
+
+A alternativa de a skill ler os docs de `node_modules/@aurea/ds-core/` foi descartada: quebra em projeto que ainda não instalou o pacote, e o `ds-learning` não faz parte do pacote npm.
 
 ---
 
@@ -83,38 +144,26 @@ Uma vez por projeto:
 
 ```txt
 /plugin marketplace add <git-url-do-ds-aurea>
-/plugin install aurea-ds
+/plugin install aurea-ds@aurea
 ```
+
+(`aurea-ds` é o nome do plugin; `aurea` é o nome do marketplace.)
 
 A partir daí o projeto tem:
 
-- a skill `aurea-ds` disponível (invocável por `/aurea-ds` ou carregada automaticamente quando relevante);
+- a skill `aurea-ds`, carregada automaticamente quando a task envolve tela, componente ou estilo;
 - o comando `/ds-check`;
-- o conhecimento do DS acessível à IA sem depender do que cada pessoa lembra.
+- o conhecimento do DS disponível para a IA, sem depender do que cada pessoa lembra.
 
-Atualização do DS = atualizar o plugin. Sem `cp -r`, sem drift.
+O código dos componentes chega separado, pelo npm (`@aurea/ds-core`). A skill **ensina a usar** o ds-core; ela não entrega o código.
+
+Atualizar o DS = publicar nova versão do `@aurea/ds-core` + atualizar o plugin. Sem `cp -r`, sem drift.
 
 ---
 
-## Manifesto do plugin
+## Manifestos
 
-`.claude-plugin/plugin.json`:
-
-```json
-{
-  "name": "aurea-ds",
-  "displayName": "Aurea Design System",
-  "version": "0.1.0",
-  "description": "Cérebro de design da Aurea: componentes, tokens e regras de interface para web e mobile",
-  "author": { "name": "Aurea Phygital" },
-  "repository": "<git-url>",
-  "keywords": ["design-system", "aurea", "ui", "mobile"]
-}
-```
-
-Apenas `name` é obrigatório. Os diretórios `skills/`, `commands/` e `agents/` são descobertos automaticamente na raiz — não precisam ser declarados.
-
-`.claude-plugin/marketplace.json` publica o plugin para instalação:
+`ds-aurea/.claude-plugin/marketplace.json`:
 
 ```json
 {
@@ -123,20 +172,35 @@ Apenas `name` é obrigatório. Os diretórios `skills/`, `commands/` e `agents/`
   "plugins": [
     {
       "name": "aurea-ds",
-      "source": "./",
+      "source": "./ds-skill",
       "description": "Cérebro de design da Aurea"
     }
   ]
 }
 ```
 
-> ⏳ O schema completo de `marketplace.json` precisa ser confirmado na documentação oficial antes do primeiro release. Campos acima são a forma esperada, não verificada.
+`ds-aurea/ds-skill/.claude-plugin/plugin.json`:
+
+```json
+{
+  "name": "aurea-ds",
+  "version": "0.1.0",
+  "description": "Cérebro de design da Aurea: componentes, tokens e regras de interface para web e mobile",
+  "author": { "name": "Aurea Phygital" },
+  "repository": "<git-url>",
+  "keywords": ["design-system", "aurea", "ui", "mobile", "web"]
+}
+```
+
+Só `name` é obrigatório no `plugin.json`. As pastas `skills/` e `commands/` são descobertas automaticamente na raiz do plugin.
+
+> ⏳ Confirmar os dois schemas na documentação oficial do Claude Code antes do primeiro release. Os campos acima são a forma esperada, não verificada.
 
 ---
 
 ## Design da skill: roteador, não enciclopédia
 
-`SKILL.md` deve ser **fino** e rotear para os arquivos de apoio. Skill grande queima contexto em toda sessão do consumidor; roteador carrega só o necessário.
+O `SKILL.md` deve ser **fino** e só apontar para os arquivos de apoio. Uma skill grande gasta contexto em toda sessão do consumidor; um roteador carrega só o necessário.
 
 ```md
 ---
@@ -147,38 +211,43 @@ description: Design System da Aurea — componentes, tokens e regras de interfac
 ⚡ If: task = criar/alterar tela → leia rules/use-ds-core.md
 ⚡ If: task = cor, espaçamento ou tipografia → leia rules/use-tokens.md
 ⚡ If: task = testID ou seletor de teste → leia rules/testid-contract.md
-⚡ If: componente não existe no catálogo → leia rules/when-ds-lacks.md
+⚡ If: componente não existe no DS → leia rules/when-ds-lacks.md
 ```
 
-Referência do padrão: `helios-app/AGENTS.md`, seção READING CONDITIONS.
+Referência do padrão: `AGENTS.md`, seção READING CONDITIONS.
 
 ---
 
-## Fonte única de verdade
+## Regras que a skill precisa ensinar ao consumidor
 
-As regras de governança são escritas **uma vez** e consumidas pelos dois lados:
+Os invariantes do `AGENTS.md` são escritos para quem **constrói** o DS. A skill traduz para quem **usa**:
 
-```txt
-ds-learning/*.md          ← fonte única
-   ├─→ AGENTS.md          referencia (construção)
-   └─→ skills/aurea-ds/   empacota (distribuição)
-```
+| Invariante (`AGENTS.md`) | O que a skill ensina no projeto consumidor |
+|---|---|
+| 1. Paper proibido no ds-core | usar componente do `@aurea/ds-core`; não criar um equivalente com Paper ou MUI quando o DS já tem |
+| 2. `shared/` sem componente | importar de `@aurea/ds-core/mobile` ou `@aurea/ds-core/web`, nunca componente de `shared` |
+| 3. `testID` é contrato de semver | passar `testID` sempre; os sufixos (`-label`, `-error`) são estáveis e podem ser usados nos testes E2E |
+| 4. ds-core sem react-hook-form | para formulário, usar o adapter `ds-core/mobile/adapters/rhf/`, não embrulhar o componente na mão |
+| 5. Cor só via token semântico | nunca hex na tela; usar `theme.colors.*` e os tokens de spacing, radius e tipografia |
 
-Escrever a mesma regra em dois lugares garante divergência em poucos meses. Se a regra "cor só via token" existir no `AGENTS.md` e na `skill`, uma das duas vai ficar desatualizada.
-
-**Decisão:** o `ds-learning/` é a fonte. O empacotamento para `skills/aurea-ds/knowledge/` é feito por script de build, não por cópia manual.
+O conteúdo dessas regras de uso vive no `ds-learning/global/` (e, portanto, no `knowledge/`). Os arquivos de `rules/` só apontam para ele.
 
 ---
 
-## Divisão de papel — construção interna
+## Quando cada parte entra
 
-| Artefato | Tipo | Quando age | Papel |
-|---|---|---|---|
-| `AGENTS.md` | doc | sempre carregado | invariantes do projeto |
-| `port-component` | skill local | sob demanda | passo-a-passo de extração `helios/@lib/atoms/X` → `ds-core` |
-| `ds-curator` | agente local | pós-implementação | audita: Paper vazou? testID obrigatório? RHF no core? token hardcoded? |
+As fases são as do `PLANO.md`. A distribuição não tem numeração própria.
 
-`ds-curator` é **agente** e não skill de propósito: roda em contexto isolado, não polui a sessão principal, e permite auditar vários componentes em paralelo durante portes em lote.
+| Momento (`PLANO.md`) | O que acontece na distribuição | Status |
+|---|---|---|
+| Fase 0 — Fundação | `.claude/` interno criado; pasta `ds-skill/` reservada, vazia | ✅ |
+| Fases 3 e 4 — Atoms e Catálogo | `ds-core` ganha componentes, `spec.md` e catálogo — é o que a skill vai ensinar | pendente |
+| Fase 5 — ds-learning (paralela) | `ds-learning` ganha conteúdo de uso e regras globais | pendente |
+| Fase 6 — Piloto helios-app | helios-app consome só o `@aurea/ds-core`, ainda sem a skill | pendente |
+| Depois — Etapa 5 do roadmap (ds-skill) | `marketplace.json`, `plugin.json`, `SKILL.md`, `rules/`, script de build do `knowledge/` + checagem na CI | pendente |
+| Depois | instalar o plugin no helios-app e validar numa task real | pendente |
+
+A skill não tem o que ensinar enquanto o `ds-core` e o `ds-learning` estiverem vazios. Por isso ela vem depois do catálogo. A **localização** (`ds-skill/`) já está decidida, para não mover arquivo depois.
 
 ---
 
@@ -186,57 +255,20 @@ Escrever a mesma regra em dois lugares garante divergência em poucos meses. Se 
 
 | Via | Por que não |
 |---|---|
-| `~/.claude/skills/` | user-level: cada pessoa instala manualmente, não versiona com o DS |
-| copiar em cada repo | drift garantido; nada avisa quando o DS muda |
-| npm `postinstall` copiando arquivos | frágil, acopla distribuição de conhecimento ao ciclo do bundler |
 | skill dentro de `ds-aurea/.claude/` | só funciona dentro do ds-aurea — não chega no consumidor |
-
----
-
-## Dependência entre skill e conhecimento
-
-A skill instrui *"consulte o ds-learning antes de implementar"*. Se o consumidor instala só o plugin, ele não tem o `ds-learning/`.
-
-Duas saídas:
-
-- **A — knowledge viaja no plugin.** Os `.md` são empacotados em `skills/aurea-ds/knowledge/`. Simples, sem dependência externa.
-- **B — skill referencia o pacote npm.** A skill lê os docs de `node_modules/@aurea/ds-core/docs/`. Evita duplicação, mas quebra se o pacote não estiver instalado.
-
-**Escolha para o MVP: A.** O plugin precisa funcionar mesmo antes do `@aurea/ds-core` existir como pacote publicado.
-
----
-
-## Faseamento
-
-| Fase | Entrega | Depende de |
-|---|---|---|
-| **0** | `CLAUDE.md`, `AGENTS.md`, `.gitignore`, esqueleto de pastas | — |
-| **1** | `.claude/skills/port-component` + `.claude/agents/ds-curator` | invariantes definidos |
-| **2** | `ds-core/shared/tokens` + primeiros componentes mobile | decisão de estratégia mobile |
-| **3** | catálogo de componentes | componentes existirem |
-| **4** | `ds-learning/` com as regras reais | uso real dos componentes |
-| **5** | `skills/aurea-ds/` + `plugin.json` + `marketplace.json` | ds-learning ter conteúdo |
-| **6** | instalar no helios-app e validar em task real | plugin publicado |
-
-A skill não tem o que dizer enquanto o `ds-core` estiver vazio. Por isso ela é Fase 5 — mas a **localização** é decidida agora, para não mover arquivo depois.
+| `~/.claude/skills/` (nível do usuário) | cada pessoa instala à mão; não versiona com o DS |
+| copiar a skill em cada repositório | drift garantido; nada avisa quando o DS muda |
+| npm `postinstall` copiando arquivos | frágil; acopla a distribuição de conhecimento ao ciclo do bundler |
+| skill lendo `node_modules/@aurea/ds-core/` | quebra sem o pacote instalado; `ds-learning` não está no pacote |
+| plugin na raiz do ds-aurea (`skills/` solta na raiz) | mistura plugin com o resto do repositório; `ds-skill/` como raiz do plugin deixa explícito o que é distribuído |
 
 ---
 
 ## Decisões em aberto
 
-| # | Decisão | Opções | Impacto |
-|---|---|---|---|
-| D3 | Schema do `marketplace.json` | confirmar na doc oficial | bloqueia Fase 5 |
+| Decisão | Opções | Impacto |
+|---|---|---|
+| Schema de `marketplace.json` e `plugin.json` | confirmar na documentação oficial | bloqueia o primeiro release do plugin |
+| Onde e como roda o script de build do `knowledge/` | script npm na raiz (`npm run build:skill`) + job de CI que compara | bloqueia o primeiro release do plugin |
 
-Já decididas (ver `PLANO.md`): estratégia mobile — implementação própria sobre primitivos RN, Paper banido do `ds-core`; distribuição do código — monorepo com npm workspaces, `file:` local → GitLab Package Registry.
-
----
-
-## Invariantes que a distribuição precisa preservar
-
-1. **Sem Paper** — `react-native-paper` não é importado em nenhum arquivo de `ds-core/`, nem dentro dos componentes. Eles são escritos sobre primitivos do React Native + Unistyles (AGENTS.md invariante 1).
-2. **`shared/` sem componente** — React Native e DOM não compartilham implementação. `shared/` guarda tokens, types e utils puros.
-3. **`testID` é contrato** — prop obrigatória no catálogo. Sufixos derivados (`-error`, `-label`) documentados. Mudança de sufixo é *breaking change* de semver, porque quebra o repositório de testes E2E (Maestro) sem sinal no build.
-4. **Core sem form-lib** — `ds-core/mobile/components/Input` não conhece react-hook-form. O binding vive em `ds-core/mobile/adapters/rhf/`, pacote opcional.
-
-A skill distribuída deve ensinar essas quatro regras aos consumidores. São elas que impedem o DS de virar mais uma pasta de componentes.
+Decisões já fechadas que a distribuição respeita estão no `PLANO.md` (D1–D5) e no `AGENTS.md`.

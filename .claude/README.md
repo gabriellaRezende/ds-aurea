@@ -1,6 +1,6 @@
 # Agentes e skills do DS-Aurea
 
-Como a IA ajuda a **construir** o Design System da Aurea. Tudo aqui é interno — vive em `.claude/`, que nunca sai deste repositório (ver `docs/DISTRIBUTION.md`). Isso é diferente da skill que, no futuro, vai ser instalada nos projetos *consumidores* do DS (`skills/aurea-ds`, Fase 5 do `PLANO.md`) — aquela ensina a usar o DS pronto; esta aqui ensina a construir o DS.
+Como a IA ajuda a **construir** o Design System da Aurea. Tudo aqui é interno — vive em `.claude/`, que nunca sai deste repositório (ver `docs/DISTRIBUTION.md`). Isso é diferente da skill que, no futuro, vai ser instalada nos projetos *consumidores* do DS (`ds-skill/`, Etapa 5 do roadmap — ver seção "Depois" do `PLANO.md`) — aquela ensina a usar o DS pronto; esta aqui ensina a construir o DS.
 
 ---
 
@@ -103,4 +103,4 @@ Os próprios arquivos de skill sinalizam isso quando aparece; documentado aqui p
 - `CLAUDE.md` (raiz) — ponteiro geral do projeto, único doc solto na raiz.
 - `AGENTS.md` — invariantes que toda etapa acima respeita (Paper banido, testID obrigatório, cor só via token, etc.).
 - `PLANO.md` — fase atual e Definition of Done que `designer`/`dev` seguem.
-- `docs/DISTRIBUTION.md` — por que isso tudo fica em `.claude/` e nunca vira parte do que é distribuído para os projetos consumidores.
+- `docs/DISTRIBUTION.md` — por que isso tudo fica em `.claude/` e nunca vira parte do que é distribuído (`ds-core/`, `ds-learning/`, `ds-skill/`) para os projetos consumidores.

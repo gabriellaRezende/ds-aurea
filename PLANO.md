@@ -250,14 +250,14 @@ Não migram: `Conditional` (o próprio `DESIGN.md` desencoraja) e `withSkeleton`
 
 **Depende de:** nada. **Pode rodar em paralelo com qualquer fase, desde o primeiro dia.**
 
-O `DESIGN.md` do helios-app já traz quase todo o conteúdo — é trabalho de separar o que é global do que é do produto.
+O `DESIGN.md` do helios-app já traz quase todo o conteúdo — é trabalho de separar o que vale para as duas plataformas do que é só mobile. O DS não separa conhecimento por produto: o que hoje é "do helios-app" vale para qualquer app mobile da Aurea.
 
 - [ ] `global/principles/` — nunca hardcodar valores; escala de spacing; tema duplo sem ramificar por nome; PT-BR
 - [ ] `global/accessibility/` — contrato `testID`/`accessibilityLabel`/`Role`/`Hint`, alvo ≥ 44dp, e o *porquê* (agente de campo, uma mão, sol, chuva)
 - [ ] `global/ux-patterns/` — padrão de formulário (RHF + Zod), árvore de decisão de select
 - [ ] `global/interaction-rules/` — toast vs dialog vs progress
-- [ ] `decisions/destructive-actions.md` — destrutivo usa `error`, nunca `primary`; à direita; 2 ações
-- [ ] `products/helios-app/` — safe area edge-to-edge, toast Android-only, particularidades de Expo
+- [ ] `global/decisions/destructive-actions.md` — destrutivo usa `error`, nunca `primary`; à direita; 2 ações
+- [ ] `global/mobile/` — regras que valem para toda tela mobile: safe area edge-to-edge, toast Android-only, particularidades de Expo
 - [ ] Regra editorial: **`ds-learning` nunca cita hex.** Fala de slot semântico. É o que impede a doc de desatualizar quando a marca muda.
 
 ---

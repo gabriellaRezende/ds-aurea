@@ -242,7 +242,7 @@ Apoio: `FocusFlowContext` (foco entre campos no submit) e `FormFieldRegistry`.
 
 ## Regras já documentadas (candidatas ao `ds-learning`)
 
-O `DESIGN.md` do helios-app já contém material pronto para virar `ds-learning/global/` e `ds-learning/products/helios-app/`:
+O `DESIGN.md` do helios-app já contém material pronto para virar `ds-learning/global/` (incluindo `global/mobile/` para o que é só mobile — o DS não separa conhecimento por produto):
 
 | Tema | Conteúdo | Destino sugerido |
 | --- | --- | --- |
@@ -250,9 +250,9 @@ O `DESIGN.md` do helios-app já contém material pronto para virar `ds-learning/
 | Tema duplo | Componentes funcionam nos dois; nunca ramificar por nome de tema, só por valor de token | `ds-learning/global/principles/` |
 | Padrão de formulário | RHF + Zod, um schema por form, sem validação de negócio no schema, submit fino | `ds-learning/global/ux-patterns/` |
 | Escolha de select | Árvore de decisão por quantidade de opções | `ds-learning/global/ux-patterns/` |
-| Modal/dialog | `BaseDialog` é canônico; nunca criar modal customizado; destrutivo à direita com `error` | `ds-learning/decisions/destructive-actions.md` |
+| Modal/dialog | `BaseDialog` é canônico; nunca criar modal customizado; destrutivo à direita com `error` | `ds-learning/global/decisions/destructive-actions.md` |
 | Toast | Feedback efêmero não bloqueante; **Android-only hoje**, no-op em iOS/web | `ds-learning/global/interaction-rules/` |
-| Safe area | Política "topo edge-to-edge, base respeita o sistema"; três lugares oficiais de tratamento | `ds-learning/products/helios-app/` (muito específico de Android/Expo) |
+| Safe area | Política "topo edge-to-edge, base respeita o sistema"; três lugares oficiais de tratamento | `ds-learning/global/mobile/` (específico de Android/Expo, vale para todo app mobile) |
 | Acessibilidade | `testID` + `accessibilityLabel` (PT-BR) + `accessibilityRole` + `accessibilityHint` obrigatórios; alvo de toque ≥ 44dp | `ds-learning/global/accessibility/` |
 | i18n | PT-BR apenas, sem lib de i18n; datas via `date-fns` + locale `ptBR` | `ds-learning/global/principles/` |
 | Padrões banidos | Tailwind/NativeWind, literais hardcoded, modal customizado, lógica de negócio em `ui/`, `console.log` | `ds-learning/global/principles/` |

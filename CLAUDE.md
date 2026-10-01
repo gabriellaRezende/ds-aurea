@@ -9,7 +9,7 @@ Design System da Aurea — base técnica, documentação e skill de orientação
 | `README.md` | Visão geral, proposta e roadmap do projeto |
 | `PLANO.md` | Sequenciamento de fases e Definition of Done por componente |
 | `AGENTS.md` | Invariantes carregados em toda sessão — leia antes de implementar |
-| `docs/DISTRIBUTION.md` | Separação `.claude/` (construção) vs `skills/` (distribuição) |
+| `docs/DISTRIBUTION.md` | O que fica interno (`.claude/`) e como `ds-core/`, `ds-learning/` e `ds-skill/` chegam nos projetos consumidores |
 | `docs/INSTALLATION.md` | Configuração obrigatória do babel no projeto consumidor |
 | `docs/mobile/inventario-helios-app.md` | Inventário completo do helios-app — artefato de migração, expira quando a Fase 3 (+ equivalente web) terminar |
 | `.claude/README.md` | Como os agentes/skills internos funcionam e ajudam a construir o DS |
@@ -20,12 +20,13 @@ Design System da Aurea — base técnica, documentação e skill de orientação
 ds-aurea/
   ds-core/           implementação técnica (shared/, mobile/, web/) — só código + spec.md técnica de cada componente
   ds-learning/       documentação de uso: por componente (component-mobile/, component-web/) e transversal (global/)
-  ds-skill/          skill para distribuição nos projetos consumidores (futuro)
-  playground/        visualização de componentes e tokens (futuro)
+  ds-skill/          plugin do Claude Code instalado nos projetos consumidores — skill que cria telas com o DS (futuro)
+  playground/        visualização de componentes e tokens
   docs/              documentação de processo e decisões do projeto
   .claude/           agentes e skills INTERNOS — nunca distribuídos
-  skills/            skill distribuída — instalada nos projetos consumidores (futuro)
 ```
+
+Distribuídos: `ds-core/` (npm), `ds-learning/` (viaja dentro do `ds-skill`) e `ds-skill/` (plugin). Internos: `.claude/`, `docs/`, `playground/`. Ver `docs/DISTRIBUTION.md`.
 
 ## Estado atual
 
@@ -33,8 +34,9 @@ ds-aurea/
 |---|---|
 | Etapa 1 — Inventário mobile (helios-app) | Concluída |
 | Fase 0 — Fundação do repositório | Concluída |
-| Fase 1 — Tokens e contrato de tema | Próxima |
-| Fase 2 — Playground (esqueleto) | Pendente |
+| Fase 1 — Tokens e contrato de tema | Concluída |
+| Fase 2 — Playground (esqueleto) | Concluída |
+| Pré-Fase 3 — EAS Build + expo-dev-client | Próxima |
 | Fase 3 — Atoms | Pendente |
 | Fase 4 — Catálogo | Pendente |
 | Fase 5 — ds-learning | Pode rodar em paralelo |

@@ -1,4 +1,4 @@
-# DS-Agent
+# DS-Aurea
 
 > Camada de Design System, conhecimento e orientação para que projetos da Aurea implementem interfaces de forma padronizada em web e mobile.
 
@@ -6,13 +6,15 @@
 
 ## Visão Geral
 
-O DS-Agent tem como objetivo centralizar o Design System da Aurea e permitir que projetos diferentes usem os mesmos componentes, tokens, padrões e regras de interface.
+O DS-Aurea tem como objetivo centralizar o Design System da Aurea e permitir que projetos diferentes usem os mesmos componentes, tokens, padrões e regras de interface.
 
 A proposta é organizar três partes principais:
 
 - **ds-core**: implementação técnica do Design System para web e mobile.
 - **ds-learning**: documentação em Markdown com princípios, padrões, regras e decisões.
 - **ds-skill**: instruções para que uma IA trabalhe dentro dos projetos respeitando o Design System.
+
+Essas três partes são feitas para serem consumidas pelos outros projetos da Aurea. Além delas, o repositório tem a pasta `.claude/`, com as skills e agentes que ajudam a construir o próprio DS. Ela é de uso interno e nunca sai do ds-aurea (ver [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md)).
 
 No MVP, o foco não é criar uma plataforma completa de geração automática de telas. O foco é criar uma base simples e utilizável, onde os componentes de web e mobile estejam organizados, documentados e disponíveis para validação em um Playground.
 
@@ -53,7 +55,7 @@ Mesmo com um Design System existente, a aplicação correta dos componentes aind
 
 ## Proposta
 
-O DS-Agent transforma o Design System em uma base operacional para projetos da Aurea.
+O DS-Aurea transforma o Design System em uma base operacional para projetos da Aurea.
 
 O fluxo inicial é:
 
@@ -77,6 +79,16 @@ Cada parte tem uma responsabilidade clara:
 - **ds-learning**: explica por que os padrões existem e como devem ser usados.
 - **ds-skill**: orienta a IA dentro dos projetos consumidores.
 - **playground**: permite validar visualmente componentes e variações sem Storybook.
+- **.claude**: skills e agentes internos que ajudam a construir o DS — não é distribuído.
+
+Como cada parte chega no projeto consumidor:
+
+| Parte | Caminho |
+| --- | --- |
+| `ds-core` | pacote npm `@aurea/ds-core` |
+| `ds-learning` | viaja dentro do `ds-skill` (cópia gerada por script) |
+| `ds-skill` | plugin do Claude Code, instalado com `/plugin install` |
+| `.claude`, `playground`, `docs` | não saem do ds-aurea |
 
 Artefatos como **UI Contract**, **UI Spec** e **Code Generator** continuam sendo importantes, mas entram como evolução depois que a base do Design System estiver organizada.
 
@@ -216,45 +228,51 @@ ds-aurea/
       catalog/
         mobileComponentCatalog.ts
 
-    docs/
-      web/
-      mobile/
-
   ds-learning/
+    component-mobile/
+      Button.md
+    component-web/
+      Button.md
     global/
+      foundations/
       principles/
       accessibility/
       ux-patterns/
       interaction-rules/
-
-    products/
-      helios-app/
-        navigation/
-        flows/
-        rules/
-        exceptions/
-      helios-portal/
-      uranus-portal/
-
-    decisions/
-      why-we-use-bottom-sheet.md
-      destructive-actions.md
-      table-density-rules.md
+      decisions/
+        destructive-actions.md
+      mobile/
 
   ds-skill/
-    SKILL.md
-    rules/
-      use-ds-core.md
-      use-ds-learning.md
-      validate-project.md
-    examples/
+    .claude-plugin/
+      plugin.json
+    skills/
+      aurea-ds/
+        SKILL.md
+        rules/
+          use-ds-core.md
+          use-tokens.md
+          testid-contract.md
+          when-ds-lacks.md
+        knowledge/        gerado a partir do ds-learning + spec.md do ds-core
+    commands/
+      ds-check.md
+
+  .claude-plugin/
+    marketplace.json      publica o ds-skill como plugin
+
+  .claude/                interno — skills e agentes que constroem o DS
 
   playground/
     web/
     mobile/
 
+  docs/                   processo e decisões do projeto
+
   README.md
 ```
+
+Cada componente tem uma `spec.md` técnica (props, exemplos, decisões de implementação) ao lado do código, em `ds-core/<plataforma>/components/<Nome>/`. O uso do componente (quando usar, quando não, tokens) fica em `ds-learning/component-<plataforma>/<Nome>.md`.
 
 Essa estrutura mantém o projeto simples, mas já deixa claro que web e mobile são plataformas diferentes dentro do mesmo Design System.
 
@@ -323,28 +341,28 @@ Ele responde:
 Por que usamos esse padrão?
 Quando usar?
 Quando não usar?
-Quais exceções existem por produto?
+O que vale só para mobile ou só para web?
 ```
 
 Exemplo:
 
 ```txt
 ds-learning/
-  global/
+  component-mobile/     uso de cada componente mobile
+  component-web/        uso de cada componente web
+  global/               conhecimento transversal (não é de um componente)
+    foundations/
     principles/
     accessibility/
     ux-patterns/
     interaction-rules/
-
-  products/
-    helios-app/
-    helios-portal/
-    uranus-portal/
-
-  decisions/
-    destructive-actions.md
-    table-density-rules.md
+    decisions/          decisões de design registradas (ex.: ações destrutivas)
+    mobile/             regras que valem para toda tela mobile (safe area, Expo)
 ```
+
+O conhecimento não é separado por produto. Uma regra que nasceu no helios-app vale para qualquer app mobile da Aurea.
+
+O `ds-learning` não é instalado direto nos projetos consumidores. Ele é copiado por script para dentro do `ds-skill`, e quem o lê é a IA do projeto.
 
 Resultado para a empresa:
 
@@ -375,6 +393,8 @@ A skill deve instruir a IA a:
 - não criar componentes novos sem necessidade;
 - sinalizar quando uma demanda não tem componente correspondente no DS.
 
+O `ds-skill` é distribuído como plugin do Claude Code. O plugin leva junto uma cópia do conhecimento (`knowledge/`), gerada por script a partir do `ds-learning` e das `spec.md` do `ds-core`. Assim a skill funciona no projeto consumidor sem acesso ao repositório do ds-aurea. Detalhes em [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md).
+
 Fluxo dentro de um projeto consumidor:
 
 ```txt
@@ -382,7 +402,7 @@ Projeto recebe uma task
   ↓
 Skill valida contexto do projeto
   ↓
-Skill consulta ds-learning
+Skill consulta o conhecimento do DS (cópia do ds-learning + specs)
   ↓
 Skill usa componentes do ds-core
   ↓
@@ -446,7 +466,7 @@ Resultado para a empresa:
 
 O UI Contract não precisa ser implementado no primeiro momento.
 
-Ele entra como evolução futura, quando o DS-Agent deixar de ser apenas uma camada de orientação e passar a apoiar geração estruturada de interface.
+Ele entra como evolução futura, quando o DS-Aurea deixar de ser apenas uma camada de orientação e passar a apoiar geração estruturada de interface.
 
 O UI Contract representa a intenção da tela.
 
@@ -602,38 +622,35 @@ Use o Button para ações explícitas do usuário.
 
 ## Uso nos Projetos Consumidores
 
-O DS-Agent deve ser pensado para apoiar projetos paralelos da Aurea.
+O DS-Aurea deve ser pensado para apoiar projetos paralelos da Aurea.
 
 Exemplo:
 
 ```txt
-Projeto DS-Agent
+Projeto DS-Aurea
   contém ds-core, ds-learning, ds-skill e Playground
 
 Projeto Produto A
-  conecta a skill
+  instala o plugin ds-skill
   usa componentes web ou mobile do ds-core
-  segue regras do ds-learning
+  segue as regras do ds-learning (que chegam junto com a skill)
 
 Projeto Produto B
-  conecta a skill
-  usa regras próprias de produto
+  instala o plugin ds-skill
+  usa os mesmos componentes do ds-core
   mantém a mesma base visual
 ```
 
-No projeto consumidor, poderia existir uma configuração simples:
+No projeto consumidor, a configuração é feita uma vez:
 
-```ts
-export default {
-  product: "produto-a",
-  platform: "web",
-  dsCore: "@aurea/ds-core",
-  knowledgeBase: "@aurea/ds-knowledge",
-  allowedComponents: ["Button", "Input", "Card", "Modal"]
-};
+```txt
+npm install @aurea/ds-core                       código dos componentes
+
+/plugin marketplace add <git-url-do-ds-aurea>    skill + conhecimento
+/plugin install aurea-ds@aurea
 ```
 
-O DS-Agent seria responsável por:
+O DS-Aurea seria responsável por:
 
 - identificar o tipo de projeto;
 - consultar as regras de uso do Design System;
@@ -710,7 +727,7 @@ Criar a documentação em Markdown com princípios, padrões, regras de interaç
 Entrega:
 
 - documentação global;
-- documentação por produto;
+- documentação por componente, para mobile e web;
 - decisões registradas;
 - exemplos de uso e exceções.
 
@@ -731,7 +748,9 @@ Entrega:
 - `SKILL.md`;
 - regras de uso do DS;
 - instruções de validação do projeto;
-- exemplos de comportamento esperado da IA.
+- exemplos de comportamento esperado da IA;
+- manifestos do plugin (`plugin.json` e `marketplace.json`);
+- script que gera o `knowledge/` a partir do `ds-learning` e das `spec.md`.
 
 Resultado para a empresa:
 
@@ -762,7 +781,7 @@ Resultado para a empresa:
 
 ### Etapa 7: Conectar em um Projeto Piloto
 
-Usar o DS-Agent em um projeto real ou projeto de teste para validar o fluxo.
+Usar o DS-Aurea em um projeto real ou projeto de teste para validar o fluxo.
 
 Entrega:
 
@@ -781,12 +800,12 @@ Resultado para a empresa:
 
 ### Etapa 8: Escalar para Outros Projetos
 
-Replicar o uso do DS-Agent em outros projetos da empresa.
+Replicar o uso do DS-Aurea em outros projetos da empresa.
 
 Entrega:
 
-- configuração por projeto;
-- regras específicas por produto;
+- `@aurea/ds-core` e o plugin `ds-skill` instalados em cada projeto;
+- lacunas encontradas em cada projeto registradas no ds-learning;
 - expansão do uso do ds-core e ds-learning.
 
 Resultado para a empresa:
@@ -862,9 +881,9 @@ Evoluir para geração assistida
 
 ## Resultado Esperado
 
-Ao final da primeira entrega, o DS-Agent deve permitir que projetos da Aurea usem componentes web e mobile do Design System de forma mais consistente, com apoio de documentação estruturada, Playground e orientação para IA.
+Ao final da primeira entrega, o DS-Aurea deve permitir que projetos da Aurea usem componentes web e mobile do Design System de forma mais consistente, com apoio de documentação estruturada, Playground e orientação para IA.
 
-Ao final da evolução, o DS-Agent também poderá apoiar a transformação de documentação funcional em interfaces padronizadas, usando UI Contract, UI Spec e geração assistida.
+Ao final da evolução, o DS-Aurea também poderá apoiar a transformação de documentação funcional em interfaces padronizadas, usando UI Contract, UI Spec e geração assistida.
 
 Para a empresa, isso proporciona:
 
