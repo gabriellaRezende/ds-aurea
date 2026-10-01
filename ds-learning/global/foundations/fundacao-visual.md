@@ -124,15 +124,17 @@ Em CSS equivale a:
 --gradient-primary: linear-gradient(90deg, #03A9F4 0%, #0D47A1 100%);
 ```
 
-### Hover — regra derivada do `primary`
+### Hover e Selecionado — regra derivada do `primary`
 
 O hover em todos os sistemas Aurea é o próprio `primary` sobreposto a **12% de opacidade** — não é uma cor nova, é uma regra de derivação. Qualquer produto recalcula o valor a partir do seu próprio `primary`; não copie o hex final de outro produto.
 
+**Regra específica de item de menu:** nesse componente, o estado selecionado/ativo usa o mesmo valor do hover — não é um token separado. Exemplo: um item de menu lateral fica com esse background assim que é selecionado, e continua com ele mesmo depois que o mouse sai (o hover é transitório, mas se o item também estiver selecionado, o fundo permanece). Ou seja, para item de menu, hover e "selecionado" convergem para o mesmo overlay — a diferença entre os dois é só a duração (enquanto o ponteiro está em cima vs. enquanto o item é o ativo), não a cor. Essa convergência é particular de item de menu — não assuma que outro componente (botão, chip, card) segue a mesma regra sem confirmar.
+
 | Slot | Regra | Valor calculado para este produto (`primary` `#0787D7`) |
 |---|---|---|
-| `primaryHover` | `primary` a 12% de opacidade | `rgba(7, 135, 215, 0.12)` (equivalente `#0787D71F` em hex8) |
+| `primaryHover` | `primary` a 12% de opacidade — hover em geral; em item de menu, também usado para o estado selecionado/ativo | `rgba(7, 135, 215, 0.12)` (equivalente `#0787D71F` em hex8) |
 
-Uso: aplicado como overlay/background do elemento interativo no estado hover (botão, item de lista, etc.) — nunca como cor de texto, e nunca substituindo o `primary` do estado padrão.
+Uso: aplicado como overlay/background do elemento interativo (botão, item de menu/lista, etc.) nos estados hover e selecionado/ativo — nunca como cor de texto, e nunca substituindo o `primary` do estado padrão.
 
 ### Feedback, layout, texto, borda e utilitário — reaproveitado do tema default
 
@@ -185,7 +187,7 @@ Traduza a tabela de tokens para CSS custom properties. Exemplo de ponto de parti
 
   /* tema — preencher com os valores da seção 2 */
   --color-primary: /* ... */;
-  --color-primary-hover: /* primary a 12% — ver seção 2, Hover */;
+  --color-primary-hover: /* primary a 12% — hover e selecionado, ver seção 2 */;
   --color-background: /* ... */;
   --color-text-primary: /* ... */;
 }
@@ -207,7 +209,7 @@ import { StyleSheet } from 'react-native-unistyles';
 const theme = {
   colors: {
     primary: /* valor da seção 2 */,
-    primaryHover: /* primary a 12% — ver seção 2, Hover */,
+    primaryHover: /* primary a 12% — hover e selecionado, ver seção 2 */,
     background: /* valor da seção 2 */,
     textPrimary: /* valor da seção 2 */,
     // ...demais slots do contrato

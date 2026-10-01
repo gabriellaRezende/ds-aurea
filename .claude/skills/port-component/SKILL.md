@@ -12,7 +12,7 @@ Use esta skill ao iniciar a portagem de qualquer componente do `helios-app` para
 ## Antes de começar
 
 1. Leia `AGENTS.md` — os invariantes são não-negociáveis.
-2. Leia `ds-core/docs/mobile/inventario-helios-app.md` — verifique os problemas já identificados para o componente.
+2. Leia `docs/mobile/inventario-helios-app.md` — verifique os problemas já identificados para o componente.
 3. Confirme a fase atual em `PLANO.md` — a ordem de portagem importa (atoms simples antes dos acoplados).
 
 ---
@@ -64,7 +64,7 @@ Se o token semântico não existe ainda, anote a lacuna — ela precisa ser pree
 Crie o arquivo em `ds-core/mobile/components/<Nome>/index.tsx`.
 
 Regras:
-- Paper pode ser importado aqui e só aqui
+- **Sem Paper** — nenhum arquivo de `ds-core/` importa Paper, nem o próprio arquivo do componente (AGENTS.md invariante 1, zero exceção). O que o Paper dava de graça no original (acessibilidade, ripple, estados) é reimplementado explicitamente sobre `Pressable`/`View`/`Text`/`TextInput` — não herdado.
 - `StyleSheet.create` do Unistyles — nunca valores literais de cor
 - Componente recebe o tema via Unistyles (`useStyles` / `createStyleSheet`)
 - Sem lógica de negócio, sem chamadas de API, sem estado de formulário
@@ -77,7 +77,6 @@ Crie (ou edite) `playground/mobile/<Nome>Playground.tsx` com:
 - todas as variantes declaradas no contrato
 - todos os estados: `default`, `disabled`, `loading` (se aplicável), `error`, `success`
 - alternador de tema (light/dark) herdado do playground
-- alternador de produto (Helios/Uranus) herdado do playground
 
 O playground é o momento de ver o componente — ajuste o que estiver errado antes de documentar.
 
@@ -85,7 +84,12 @@ O playground é o momento de ver o componente — ajuste o que estiver errado an
 
 ## Passo 6 — Documentar
 
-Crie `ds-core/docs/mobile/components/<Nome>.md` com:
+Cada componente tem dois documentos, com donos diferentes:
+
+- **`ds-learning/component-mobile/<Nome>.md`** — uso + tokens. Escrito pelo `designer` (`documental` + `visual`). Conteúdo que vale pras duas plataformas vai em `ds-learning/global/`, não aqui.
+- **`ds-core/mobile/components/<Nome>/spec.md`** — props, exemplos de uso e decisões de implementação. Escrito aqui, no formato definido em `.claude/skills/dev/desenvolvedor.md` (seção "Spec técnica"). É a única documentação que vive em `ds-core`.
+
+No fluxo via `/ds-designer`, o `.md` de `ds-learning` já existe — escreva só a `spec.md` e não edite o de `ds-learning`. Se estiver usando esta skill isoladamente (sem `designer` ter rodado antes), crie também o `.md` de `ds-learning`:
 
 ```markdown
 # <Nome>
@@ -95,6 +99,8 @@ Descrição de uma linha.
 ## Quando usar
 
 ## Quando não usar
+
+## Onde é usado
 
 ## Variantes
 
@@ -106,16 +112,9 @@ Descrição de uma linha.
 | Estado | Comportamento |
 |---|---|
 
-## Props
+## Tokens
 
-| Prop | Tipo | Obrigatório | Descrição |
-|---|---|---|---|
-| testID | string | sim | |
-| accessibilityLabel | string | sim | |
-
-## Tokens utilizados
-
-## Exemplos de uso
+(nome do token por parte/estado — nunca hex ou valor cru)
 ```
 
 ---
@@ -125,7 +124,7 @@ Descrição de uma linha.
 Rode o agente `ds-curator` sobre o componente:
 
 ```
-use agent ds-curator: audite o componente <Nome> em ds-core/mobile/components/<Nome>/index.tsx
+use agent ds-curator: audite o componente <Nome> — plataformas: mobile
 ```
 
 Corrija tudo que o agente apontar antes de considerar o componente pronto.
@@ -141,4 +140,4 @@ Nenhum componente está pronto enquanto os seis itens abaixo não fecharem:
 - [ ] `testID` + `accessibilityLabel` + `accessibilityRole` + `accessibilityHint` no contrato
 - [ ] Funciona em light e dark
 - [ ] Entrada no playground cobrindo todas as variantes e estados
-- [ ] Doc em `ds-core/docs/mobile/components/<Nome>.md`
+- [ ] Doc de uso + tokens em `ds-learning/component-mobile/<Nome>.md` e spec técnica em `ds-core/mobile/components/<Nome>/spec.md`

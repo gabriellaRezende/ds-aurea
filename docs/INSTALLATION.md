@@ -113,8 +113,9 @@ O `@aurea/ds-core` declara as seguintes `peerDependencies`. O projeto consumidor
 |---|---|
 | `react` | `^19.2.0` |
 | `react-native` | `^0.83.0` |
-| `react-native-paper` | `^5.15.0` |
 | `react-native-unistyles` | `^3.1.0` |
 | `expo` | `~55.0.0` |
 
-> Instalar qualquer um desses como `dependency` direta no `ds-core` causaria duas instâncias do mesmo pacote rodando simultaneamente, o que quebra o contexto de tema do Unistyles e do Paper.
+> Instalar qualquer um desses como `dependency` direta no `ds-core` causaria duas instâncias do mesmo pacote rodando simultaneamente, o que quebra o contexto de tema do Unistyles.
+
+`react-native-paper` não é dependência do `ds-core` (AGENTS.md invariante 1). Se o projeto consumidor ainda usa Paper durante a migração, isso é dependência dele, não do DS.

@@ -2,7 +2,7 @@
 
 > O que precisa ser feito para sair do repositório vazio até o `ds-core/mobile` sendo consumido pelo helios-app.
 >
-> Base: [inventário do helios-app](ds-core/docs/mobile/inventario-helios-app.md) (Etapa 1, concluída).
+> Base: [inventário do helios-app](docs/mobile/inventario-helios-app.md) (Etapa 1, concluída).
 
 ---
 
@@ -21,7 +21,7 @@
 
 Hoje o repositório tem só a estrutura de pastas vazia, o README e o inventário. Nenhum `package.json`, nenhum toolchain.
 
-**Stack alvo** (herdada do helios-app): Expo ~55, React Native 0.83, React 19.2, TypeScript ~5.9, React Native Paper ^5.15, Unistyles ^3.1, Node 22.
+**Stack alvo**: Expo ~55, React Native 0.83, React 19.2, TypeScript ~5.9, Unistyles ^3.1, Node 22.
 
 ---
 
@@ -53,18 +53,16 @@ A Aurea já usa GitLab, então o registry é o caminho de menor atrito a médio 
 
 ### D3 — O `ds-core/mobile` embrulha o React Native Paper? 🔴 bloqueia
 
-Essa é a decisão mais cara de reverter.
+**Decisão: não. Componentes do zero sobre primitivos do RN.**
 
-**Recomendação: sim, manter o Paper por baixo — mas com contrato fechado.**
+O DS não usa Paper. Cada componente é escrito sobre `Pressable`, `View`, `Text`, `TextInput` e similares, com estilo inteiramente via Unistyles v3.
 
-Os componentes do helios-app são wrappers finos do Paper. Duas saídas:
+Consequências que guiam a Fase 3:
 
-- **Manter o Paper** como dependência de par (`peerDependency`). Migração barata, Material Design 3 de graça, acessibilidade pronta. Preço: todo produto Aurea mobile fica preso ao Paper e ao Material Design.
-- **Reimplementar do zero** sobre primitivos do RN. Liberdade visual total e nenhum peso extra. Preço: refazer acessibilidade, estados, ripple, animação — semanas de trabalho e risco de regressão.
-
-Como o objetivo do MVP é padronizar o que já existe, e não redesenhar a identidade da Aurea, manter o Paper é o certo. **Mas o contrato de props precisa ser fechado** — hoje `Button` faz `extends ButtonProps` e vaza a API inteira do Paper. Sem fechar isso, a Etapa 3 (catálogo) não tem o que catalogar e o `ds-skill` não consegue validar nada.
-
-> Se um dia a Aurea quiser sair do Material Design, o contrato fechado é justamente o que torna a troca possível sem quebrar os consumidores.
+- **Acessibilidade é responsabilidade do DS** — `accessibilityRole`, `accessibilityState`, foco, alvo mínimo de 44dp, ripple analógico com `Pressable`. Nenhuma dessas coisas vem de graça.
+- **Liberdade visual total** — sem amarração ao Material Design 3. A identidade Aurea é definida pelos tokens, não pelo Paper.
+- **Contrato de props é explícito desde o início** — sem `extends XProps` de biblioteca de terceiros. Cada prop do componente é declarada intencionalmente.
+- **Paper é banido** do ds-core (ver AGENTS.md invariante 1). O helios-app mantém sua dependência atual do Paper enquanto migra; o ds-core nunca a terá.
 
 ### D4 — O `ds-core/mobile` distribui código-fonte ou compilado? ⚠️ técnica
 
@@ -83,7 +81,7 @@ Não é preferência — é exigência do Unistyles 3. O plugin Babel dele preci
 Consequências que precisam entrar na documentação de instalação:
 
 - publicar `.ts`/`.tsx` fonte (sem passo de build para o pacote mobile);
-- `react-native-unistyles`, `react-native-paper`, `react`, `react-native` como **peerDependencies** — nunca dependências diretas, sob pena de duplicar instância e quebrar o tema;
+- `react-native-unistyles`, `react`, `react-native` como **peerDependencies** — nunca dependências diretas, sob pena de duplicar instância e quebrar o tema;
 - o passo do `babel.config.js` é obrigatório e silencioso quando esquecido (estilos simplesmente não aplicam). Vale um item de troubleshooting.
 
 ### D5 — Como o helios-app migra? ⚠️ processo
@@ -106,7 +104,7 @@ Assim o app nunca fica quebrado e cada componente migrado é um PR pequeno e rev
 **Depende de:** D1, D2, D3, D4.
 
 - [ ] `package.json` na raiz com workspaces (`ds-core`, `playground/*`)
-- [ ] `ds-core/package.json` como `@aurea/ds-core`, com peerDependencies de `react`, `react-native`, `react-native-paper`, `react-native-unistyles`
+- [ ] `ds-core/package.json` como `@aurea/ds-core`, com peerDependencies de `react`, `react-native`, `react-native-unistyles`
 - [ ] `tsconfig.base.json` + `tsconfig.json` por pacote, com `paths` para `@aurea/ds-core/*`
 - [ ] ESLint + Prettier — copiar a config do helios-app para não divergir de estilo entre repos
 - [ ] `.editorconfig`, `.gitignore`, `.nvmrc` (Node 22)
@@ -145,7 +143,7 @@ Trabalho novo — não existe no helios-app hoje. Precisa de decisão de design,
 
 - [ ] `ds-core/shared/themes/contract.ts` — `type ThemeColors` com todos os slots
 - [ ] `ds-core/shared/themes/default.ts` — feedback, layout, texto, bordas e utilitários (light + dark)
-- [ ] `ds-core/shared/themes/helios.ts` — marca Helios: `primary` `#E53935`, `accent` `#1BC47D`, `gradient`
+- [ ] `ds-core/shared/themes/aurea.ts` — identidade visual única (não mais uma por produto, ver AGENTS.md invariante 5): `primary` Gold `#F0C230`, `accent` Blue `#16193C`, `gradient` (tonal, tint do Gold)
 - [ ] Converter `gradient` da sintaxe CSS para valor cru (cores + stops), com adaptador por plataforma
 - [ ] Teste de paridade: light e dark declaram exatamente os mesmos slots
 - [ ] Teste de contraste WCAG AA nos pares texto/fundo dos dois temas
@@ -170,13 +168,12 @@ Com os tokens da Fase 1 prontos, já dá para montar um playground útil mesmo s
 
 - [ ] App Expo em `playground/mobile`, consumindo `@aurea/ds-core` por workspace
 - [ ] Alternador de tema (light/dark)
-- [ ] Alternador de produto (Helios/Uranus) — mesmo componente trocando de marca
 - [ ] Tela de tokens: paleta, escala de spacing, radius, tipografia, elevação
 - [ ] Navegação por componente (lista vazia no começo)
 - [ ] Painel de controles reaproveitável — variante, tamanho, estado (`default`, `disabled`, `loading`, `error`, `success`)
 - [ ] Hot reload funcionando contra o `ds-core` do workspace
 
-O alternador de produto é o item mais valioso: é ele que prova na tela que **cor é de produto e componente é de DS**. E a tela de tokens já é útil sozinha — dá para revisar a escala de spacing e as lacunas de elevação/tipografia da Fase 1.2 olhando, em vez de imaginando.
+A tela de tokens é o item mais valioso: é ela que prova na tela que **componente nunca hardcoda cor** — qualquer ajuste na identidade visual (hoje única entre todos os produtos, ver AGENTS.md invariante 5) se reflete em todo componente sem editar um por um. Ela já é útil sozinha desde já — dá para revisar a escala de spacing e as lacunas de elevação/tipografia da Fase 1.2 olhando, em vez de imaginando.
 
 **Saída:** ambiente rodando onde qualquer componente novo aparece assim que é escrito.
 
@@ -219,12 +216,12 @@ Ordem sugerida, do mais simples ao mais acoplado:
 
 Um componente **não está pronto** enquanto os seis itens não fecharem. A entrada no playground faz parte do componente, não é tarefa posterior:
 
-- [ ] contrato de props fechado e explícito — sem `extends XProps` do Paper, sem `any`
+- [ ] contrato de props fechado e explícito — sem `extends XProps` de terceiros, sem `any`
 - [ ] todos os valores visuais vindos de token (o `Button` hoje hardcoda `borderRadius: 4`)
 - [ ] `testID` + `accessibilityLabel` + `accessibilityRole` + `accessibilityHint` no contrato
 - [ ] funciona em light e dark
 - [ ] **entrada no playground cobrindo todas as variantes e estados**
-- [ ] doc em `ds-core/docs/mobile/components/<Nome>.md`
+- [ ] doc de uso + tokens em `ds-learning/component-mobile/<Nome>.md` e spec técnica em `ds-core/mobile/components/<Nome>/spec.md` (a única documentação que vive em ds-core)
 
 Na prática o ciclo por componente é: escreve o componente → registra no playground → olha nos dois temas e nas duas marcas → ajusta → documenta. O playground fecha o loop antes de o componente sair da mão de quem escreveu.
 
@@ -294,7 +291,7 @@ O `ds-skill` depende do catálogo da Fase 3 para ter o que validar — antes dis
 | Risco | Impacto | Mitigação |
 | --- | --- | --- |
 | Plugin Babel do Unistyles não configurado no consumidor | Estilos não aplicam, **sem erro** | Doc de instalação + teste de fumaça no piloto que falha se o tema não resolver |
-| Prender o DS ao Material Design (D3) | Difícil mudar identidade depois | Contrato de props fechado isola o consumidor do Paper |
+| Acessibilidade implementada de forma incompleta | Componente passa no build mas falha no TalkBack | Checklist de acessibilidade no DoD (role + state + alvo 44dp + ripple); teste manual obrigatório antes de fechar o componente |
 | Catálogo escrito à mão diverge do código | `ds-skill` valida contra ficção | Derivar dos tipos + teste que quebra |
 | helios-app evolui durante a migração | Retrabalho, divergência | Strangler por alias (D5); PRs pequenos |
 | Renomear tokens (`gray500` → semântico) quebra usos | Regressão visual | Manter alias deprecado por uma versão |

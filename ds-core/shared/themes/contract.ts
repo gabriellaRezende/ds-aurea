@@ -1,5 +1,5 @@
 // Contrato de tema — define todos os slots semânticos de cor que qualquer tema Aurea deve declarar.
-// O compilador usa esse tipo para cobrar slots faltando em default.ts e helios.ts.
+// O compilador usa esse tipo para cobrar slots faltando em default.ts e aurea.ts.
 
 // Gradiente como valor cru — cada plataforma adapta o formato de consumo.
 // Mobile: expo-linear-gradient. Web: CSS linear-gradient().

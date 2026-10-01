@@ -4,13 +4,13 @@ Regras que não mudam, independente da fase ou componente. Leia antes de qualque
 
 ---
 
-## 1. Paper encapsulado
+## 1. Paper é proibido no ds-core
 
-`react-native-paper` só pode ser importado dentro de `ds-core/mobile/components/`.
+`react-native-paper` não é dependência do ds-core. Os componentes são escritos sobre primitivos do React Native (`Pressable`, `View`, `Text`, `TextInput`) com estilo via Unistyles v3.
 
-O projeto consumidor **nunca** importa Paper diretamente. Se algo do Paper não está exposto pelo ds-core, o caminho é adicionar ao ds-core — nunca abrir o encapsulamento no consumidor.
+Nenhum arquivo de `ds-core/` importa Paper. Nenhum componente estende `ButtonProps`, `TextInputProps` ou qualquer tipo do Paper.
 
-Sinal de violação: `import { ... } from 'react-native-paper'` fora de `ds-core/mobile/components/`.
+Sinal de violação: `import { ... } from 'react-native-paper'` em qualquer arquivo de `ds-core/`.
 
 ---
 
@@ -48,7 +48,7 @@ Sinal de violação: `import { Controller, useFormContext, ... } from 'react-hoo
 
 Nenhum componente usa valor de cor hardcoded (hex, rgb, hsl).
 
-Toda cor vem de um slot semântico do tema (`theme.colors.primary`, `theme.colors.error`, etc). Isso garante que light/dark funcionem e que trocar a marca Helios por outra não exija editar componentes.
+Toda cor vem de um slot semântico do tema (`theme.colors.primary`, `theme.colors.error`, etc). Isso garante que light/dark funcionem e que a identidade visual — única para todos os produtos da Aurea, não mais uma por produto — possa evoluir sem precisar editar componente por componente.
 
 Sinal de violação: string de cor literal em qualquer arquivo de `ds-core/`.
 
@@ -61,6 +61,7 @@ Sinal de violação: string de cor literal em qualquer arquivo de `ds-core/`.
 | Escrever ou alterar componente | `PLANO.md` (Definition of Done) + invariantes acima |
 | Portar componente do helios-app | skill `.claude/skills/port-component/SKILL.md` |
 | Auditar componente já escrito | agente `.claude/agents/ds-curator.md` |
-| Tokens ou tema | `ds-core/docs/mobile/inventario-helios-app.md` — seção Tokens |
+| Tokens ou tema | `docs/mobile/inventario-helios-app.md` — seção Tokens |
 | Escrever ds-learning | Nunca citar hex — falar de slot semântico |
+| Documentar componente | Uso + tokens em `ds-learning/component-<plataforma>/<Nome>.md`; props e exemplos em `ds-core/<plataforma>/components/<Nome>/spec.md` |
 | Qualquer dúvida de sequência | `PLANO.md` — seção da fase atual |

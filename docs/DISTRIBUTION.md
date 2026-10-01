@@ -226,17 +226,15 @@ A skill não tem o que dizer enquanto o `ds-core` estiver vazio. Por isso ela é
 
 | # | Decisão | Opções | Impacto |
 |---|---|---|---|
-| D1 | Estratégia mobile | wrapper sobre react-native-paper · híbrido (wrapper + substituição gradual) · implementação própria | define custo do projeto: semanas vs trimestres |
-| D2 | Distribuição do `ds-core` (código) | npm no GitLab Package Registry · git submodule · monorepo workspace · cópia manual | define versionamento e política de breaking change |
 | D3 | Schema do `marketplace.json` | confirmar na doc oficial | bloqueia Fase 5 |
 
-D1 e D2 não bloqueiam as Fases 0 e 1.
+Já decididas (ver `PLANO.md`): estratégia mobile — implementação própria sobre primitivos RN, Paper banido do `ds-core`; distribuição do código — monorepo com npm workspaces, `file:` local → GitLab Package Registry.
 
 ---
 
 ## Invariantes que a distribuição precisa preservar
 
-1. **Paper encapsulado** — `react-native-paper` só pode ser importado dentro dos átomos do `ds-core/mobile`. Consumidor nunca importa Paper direto.
+1. **Sem Paper** — `react-native-paper` não é importado em nenhum arquivo de `ds-core/`, nem dentro dos componentes. Eles são escritos sobre primitivos do React Native + Unistyles (AGENTS.md invariante 1).
 2. **`shared/` sem componente** — React Native e DOM não compartilham implementação. `shared/` guarda tokens, types e utils puros.
 3. **`testID` é contrato** — prop obrigatória no catálogo. Sufixos derivados (`-error`, `-label`) documentados. Mudança de sufixo é *breaking change* de semver, porque quebra o repositório de testes E2E (Maestro) sem sinal no build.
 4. **Core sem form-lib** — `ds-core/mobile/components/Input` não conhece react-hook-form. O binding vive em `ds-core/mobile/adapters/rhf/`, pacote opcional.

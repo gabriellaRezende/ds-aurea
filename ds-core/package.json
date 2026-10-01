@@ -24,7 +24,6 @@
   "peerDependencies": {
     "react": "^19.2.0",
     "react-native": ">=0.83.0",
-    "react-native-paper": "^5.15.0",
     "react-native-unistyles": "^3.1.0"
   },
   "devDependencies": {

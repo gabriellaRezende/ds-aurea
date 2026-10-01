@@ -11,14 +11,15 @@ Design System da Aurea — base técnica, documentação e skill de orientação
 | `AGENTS.md` | Invariantes carregados em toda sessão — leia antes de implementar |
 | `docs/DISTRIBUTION.md` | Separação `.claude/` (construção) vs `skills/` (distribuição) |
 | `docs/INSTALLATION.md` | Configuração obrigatória do babel no projeto consumidor |
-| `ds-core/docs/mobile/inventario-helios-app.md` | Inventário completo do helios-app (Etapa 1 concluída) |
+| `docs/mobile/inventario-helios-app.md` | Inventário completo do helios-app — artefato de migração, expira quando a Fase 3 (+ equivalente web) terminar |
+| `.claude/README.md` | Como os agentes/skills internos funcionam e ajudam a construir o DS |
 
 ## Estrutura do repositório
 
 ```
 ds-aurea/
-  ds-core/           implementação técnica (shared/, mobile/, web/)
-  ds-learning/       documentação de princípios, padrões e decisões
+  ds-core/           implementação técnica (shared/, mobile/, web/) — só código + spec.md técnica de cada componente
+  ds-learning/       documentação de uso: por componente (component-mobile/, component-web/) e transversal (global/)
   ds-skill/          skill para distribuição nos projetos consumidores (futuro)
   playground/        visualização de componentes e tokens (futuro)
   docs/              documentação de processo e decisões do projeto
@@ -43,5 +44,5 @@ ds-aurea/
 
 1. Leia `AGENTS.md` — invariantes que não mudam.
 2. Leia `PLANO.md` — fase atual, sequência e Definition of Done.
-3. Para portar componente do helios-app: use `.claude/skills/port-component`.
-4. Para auditar componente já escrito: use `.claude/agents/ds-curator`.
+3. Para criar, portar ou auditar um componente: use `/ds-designer` — orquestra a esteira inteira (designer → dev → curador). Ver `.claude/README.md` para como cada peça funciona.
+4. `.claude/skills/port-component` e `.claude/agents/ds-curator` continuam existindo e podem ser usados diretamente, mas hoje são acionados pelo `/ds-designer` como parte do fluxo padrão.

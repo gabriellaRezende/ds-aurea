@@ -3,32 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { usePlayground } from '../context/PlaygroundContext';
 
 export function PlaygroundHeader() {
-  const { product, mode, theme, setProduct, setMode } = usePlayground();
+  const { mode, theme, setMode } = usePlayground();
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.borderSubtle }]}>
-      <View style={styles.group}>
-        <Text style={[styles.label, { color: theme.colors.textSecondary }]}>Produto</Text>
-        <View style={styles.toggle}>
-          <TouchableOpacity
-            style={[styles.option, product === 'helios' && { backgroundColor: theme.colors.primary }]}
-            onPress={() => setProduct('helios')}
-          >
-            <Text style={[styles.optionText, { color: product === 'helios' ? '#fff' : theme.colors.textPrimary }]}>
-              Helios
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.option, product === 'uranus' && { backgroundColor: theme.colors.primary }]}
-            onPress={() => setProduct('uranus')}
-          >
-            <Text style={[styles.optionText, { color: product === 'uranus' ? '#fff' : theme.colors.textPrimary }]}>
-              Uranus
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
       <View style={styles.group}>
         <Text style={[styles.label, { color: theme.colors.textSecondary }]}>Modo</Text>
         <View style={styles.toggle}>
@@ -57,7 +35,7 @@ export function PlaygroundHeader() {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 8,
     paddingHorizontal: 16,
